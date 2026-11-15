@@ -7,7 +7,7 @@ def call (Map configMap){
         }
         environment {
             SUB = "jenkins"
-            appVersion = configMap.get("appVersion")
+            APP_VERSION = "${configMap.appVersion ?: ''}"
             acc_id = "182312754465"
             PROJECT = configMap.get("project")
             COMPONENT = configMap.get("component")
@@ -38,7 +38,7 @@ def call (Map configMap){
                                 set -e
                                 aws eks update-kubeconfig --region ${REGION} --name ${PROJECT}-${deploy_to}
                                 kubectl get nodes
-                                sed -i "s/IMAGE_VERSION/${appVersion}/g" values.yaml
+                                sed -i "s/IMAGE_VERSION/${env.APP_VERSION}/g" values.yaml
                                 helm upgrade --install ${COMPONENT} -f values-${deploy_to}.yaml -n ${PROJECT} --atomic --wait --timeout=5m .
                                 
                                 
